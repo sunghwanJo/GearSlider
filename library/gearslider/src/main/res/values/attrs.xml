@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GearSlider">
+        <attr name="init_value" format="integer" />
+        <attr name="number_of_bar" format="integer" />
+        <attr name="interval_of_longbar" format="integer"/>
+
+        <attr name="interval_of_bar" format="dimension" />
+        <attr name="height_of_longbar" format="dimension" />
+        <attr name="height_of_bar" format="dimension" />
+
+        <attr name="centerbar_color" format="color"/>
+        <attr name="background_color" format="color"/>
+        <attr name="bar_color" format="color"/>
+
+        <attr name="on_fling" format="boolean"/>
+    </declare-styleable>
+</resources>
