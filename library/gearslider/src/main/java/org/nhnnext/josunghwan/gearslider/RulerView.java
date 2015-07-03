@@ -29,8 +29,8 @@ public class RulerView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int tempLongBarDistance = ((int) (height - mAttrs.mHeightOfLongBar))/2;
-        int tempBarDistance = ((int) (height - mAttrs.mHeightOfBar))/2;
+        int tempLongBarDistance = ((int) (height - mAttrs.mHeightOfLongBar)) / 2;
+        int tempBarDistance = ((int) (height - mAttrs.mHeightOfBar)) / 2;
 
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth((int) 1.5 * GearSlider.DPSIZE);
@@ -46,7 +46,7 @@ public class RulerView extends View {
         }
     }
 
-    public static class Attrs{
+    public static class Attrs {
         public int mIntervalOfBar;
         public int mIntervalOfLongBar;
         public int mNumberOfBar;
@@ -54,7 +54,7 @@ public class RulerView extends View {
         public float mHeightOfLongBar;
         public int mBarColor;
 
-        public Attrs(int intervalOfBar, int intervalOfLongBar,int numberOfBar, float heightOfBar, float heightOfLongBar, int barColor) {
+        public Attrs(int intervalOfBar, int intervalOfLongBar, int numberOfBar, float heightOfBar, float heightOfLongBar, int barColor) {
             this.mIntervalOfBar = intervalOfBar;
             this.mIntervalOfLongBar = intervalOfLongBar;
             this.mNumberOfBar = numberOfBar;

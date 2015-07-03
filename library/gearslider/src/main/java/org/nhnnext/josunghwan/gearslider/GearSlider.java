@@ -100,7 +100,7 @@ public class GearSlider extends FrameLayout {
         mDetector = new GestureDetectorCompat(getContext(), new MyGestureListener());
     }
 
-    public void setNumberOfBar(int newValue){
+    public void setNumberOfBar(int newValue) {
         mNumberOfBar = newValue;
         removeView(mRulerView);
         removeView(mCenterBar);
@@ -109,7 +109,7 @@ public class GearSlider extends FrameLayout {
         mRulerView = new RulerView(mContext, attrs);
         addView(mRulerView);
 
-        mCenterBar = new CenterBar(mContext, mBackgroundColor, mCenterBarColor);
+        mCenterBar = new CenterBar(mContext, mBackgroundColor, mCenterBarColor, mHeightOfLongBar);
         addView(mCenterBar);
     }
 
@@ -125,7 +125,7 @@ public class GearSlider extends FrameLayout {
         mRulerView = new RulerView(mContext, attrs);
         addView(mRulerView);
 
-        mCenterBar = new CenterBar(mContext, mBackgroundColor, mCenterBarColor);
+        mCenterBar = new CenterBar(mContext, mBackgroundColor, mCenterBarColor, mHeightOfLongBar);
         addView(mCenterBar);
     }
 
@@ -164,17 +164,17 @@ public class GearSlider extends FrameLayout {
         @Override
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
-            if(!isFling)
+            if (!isFling)
                 return true;
             Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
             Log.d(DEBUG_TAG, "VelocityX: " + velocityX);
             int tempValue;
             int moveValue;
-            if(Math.abs(velocityX) > 4000) {
+            if (Math.abs(velocityX) > 4000) {
                 moveValue = getMoveValue(Math.abs(velocityX));
-                if (velocityX<0) {
-                    if (mCurrentValue + 6 * moveValue > getMaximumValue()+1)
-                        tempValue = getMaximumValue()+1;
+                if (velocityX < 0) {
+                    if (mCurrentValue + 6 * moveValue > getMaximumValue() + 1)
+                        tempValue = getMaximumValue() + 1;
                     else
                         tempValue = mCurrentValue + 6 * moveValue;
                 } else {
@@ -190,11 +190,11 @@ public class GearSlider extends FrameLayout {
 
         private int getMoveValue(float velocityX) {
             velocityX /= 1000;
-            if(velocityX > 12)
+            if (velocityX > 12)
                 return 24;
-            else{
+            else {
                 velocityX -= 4;
-                return (int) (velocityX*2 + 4);
+                return (int) (velocityX * 2 + 4);
             }
         }
     }

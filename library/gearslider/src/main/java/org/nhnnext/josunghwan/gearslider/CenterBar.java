@@ -18,11 +18,13 @@ public class CenterBar extends View {
 
     private int mBackgroundColor;
     private int mCenterBarColor;
+    private float mHeightOfLongBar;
 
-    public CenterBar(Context context, int backgroundColor, int centerbarColor) {
+    public CenterBar(Context context, int backgroundColor, int centerbarColor, float heightOfLongBar) {
         super(context);
         mBackgroundColor = backgroundColor;
         mCenterBarColor = centerbarColor;
+        mHeightOfLongBar = heightOfLongBar;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class CenterBar extends View {
         int transparentColor = Color.argb(0, red, green, blue);
         int[] colors = {darkColor, transparentColor, transparentColor, darkColor};
         float[] colorPos = {0.0f, 0.25f, 0.75f, 1.0f};
-        LinearGradient upperShader = new LinearGradient(0, height/2, width, height/2, colors, colorPos, Shader.TileMode.CLAMP);
+        LinearGradient upperShader = new LinearGradient(0, height / 2, width, height / 2, colors, colorPos, Shader.TileMode.CLAMP);
         shader_paint.setShader(upperShader);
         canvas.drawRect(0, 0, width, height, shader_paint);
         shader_paint.setShader(null);
@@ -59,8 +61,9 @@ public class CenterBar extends View {
         paint.setColor(mCenterBarColor);
         paint.setStrokeCap(Paint.Cap.ROUND);
 
+        int tempLongBarDistance = ((int) (height - mHeightOfLongBar)) / 2;
         float x = (float) (getWidth() / 2);
-        canvas.drawLine(x, 13 * GearSlider.DPSIZE, x, 53 * GearSlider.DPSIZE, paint);
+        canvas.drawLine(x, tempLongBarDistance, x, tempLongBarDistance + mHeightOfLongBar, paint);
 
     }
 }
