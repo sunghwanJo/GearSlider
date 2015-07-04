@@ -17,11 +17,13 @@
         custom:height_of_bar="37dp"
         custom:height_of_longbar="50dp"
         custom:centerbar_color="@android:color/holo_green_dark"
-        custom:on_fling="true"
         custom:init_value="0"
         custom:interval_of_bar="20dp"
         custom:number_of_bar="50"
         custom:interval_of_longbar="5"
+        custom:on_fling="true"
+        custom:fling_max_value="50"
+        custom:fling_min_value="10"
         />
 
     <TextView

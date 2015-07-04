@@ -14,5 +14,7 @@
         <attr name="bar_color" format="color"/>
 
         <attr name="on_fling" format="boolean"/>
+        <attr name="fling_max_value" format="integer"/>
+        <attr name="fling_min_value" format="integer"/>
     </declare-styleable>
 </resources>

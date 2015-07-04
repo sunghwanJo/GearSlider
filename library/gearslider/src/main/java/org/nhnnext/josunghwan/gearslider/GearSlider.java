@@ -33,6 +33,8 @@ public class GearSlider extends FrameLayout {
     private int mBarColor;
 
     private boolean isFling;
+    private int mFlingMaxValue;
+    private int mFlingMinValue;
 
     public static float DPSIZE;
 
@@ -76,6 +78,8 @@ public class GearSlider extends FrameLayout {
             mBarColor = a.getColor(R.styleable.GearSlider_bar_color, -1);
 
             isFling = a.getBoolean(R.styleable.GearSlider_on_fling, false);
+            mFlingMaxValue = a.getInteger(R.styleable.GearSlider_fling_max_value, 24);
+            mFlingMinValue = a.getInteger(R.styleable.GearSlider_fling_min_value, 4);
         } finally {
             a.recycle();
         }
@@ -173,15 +177,15 @@ public class GearSlider extends FrameLayout {
             if (Math.abs(velocityX) > 4000) {
                 moveValue = getMoveValue(Math.abs(velocityX));
                 if (velocityX < 0) {
-                    if (mCurrentValue + 6 * moveValue > getMaximumValue() + 1)
+                    if (mCurrentValue + moveValue > getMaximumValue() + 1)
                         tempValue = getMaximumValue() + 1;
                     else
-                        tempValue = mCurrentValue + 6 * moveValue;
+                        tempValue = mCurrentValue + moveValue;
                 } else {
-                    if (mCurrentValue - 6 * moveValue < getMinimumValue())
+                    if (mCurrentValue - moveValue < getMinimumValue())
                         tempValue = getMinimumValue();
                     else
-                        tempValue = mCurrentValue - 6 * moveValue;
+                        tempValue = mCurrentValue - moveValue;
                 }
                 setValueWithAnimation(tempValue);
             }
@@ -190,11 +194,11 @@ public class GearSlider extends FrameLayout {
 
         private int getMoveValue(float velocityX) {
             velocityX /= 1000;
-            if (velocityX > 12)
-                return 24;
+            velocityX -= 4;
+            if (velocityX > 10)
+                return mFlingMaxValue;
             else {
-                velocityX -= 4;
-                return (int) (velocityX * 2 + 4);
+                return (int) ( mFlingMinValue + ((mFlingMaxValue - mFlingMinValue) / 10) * velocityX);
             }
         }
     }
