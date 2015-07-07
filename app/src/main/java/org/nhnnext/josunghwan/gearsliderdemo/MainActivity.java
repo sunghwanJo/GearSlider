@@ -26,8 +26,9 @@ public class MainActivity extends AppCompatActivity implements GearSlider.OnValu
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gs.setNumberOfBar(10);
-                gs.setValue(10);
+//                gs.setNumberOfBar(10);
+//                gs.setValue(10);
+                gs.shake();
             }
         });
         tv = (TextView) findViewById(R.id.textt);

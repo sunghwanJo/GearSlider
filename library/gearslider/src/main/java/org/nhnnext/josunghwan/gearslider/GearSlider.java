@@ -2,12 +2,15 @@ package org.nhnnext.josunghwan.gearslider;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
 import com.daimajia.easing.Glider;
@@ -35,6 +38,9 @@ public class GearSlider extends FrameLayout {
     private boolean isFling;
     private int mFlingMaxValue;
     private int mFlingMinValue;
+
+    private SoundPool mSoundPool;
+    private int mTickSoundId;
 
     public static float DPSIZE;
 
@@ -102,6 +108,8 @@ public class GearSlider extends FrameLayout {
         setClickable(true);
         setBackgroundColor(mBackgroundColor);
         mDetector = new GestureDetectorCompat(getContext(), new MyGestureListener());
+        mSoundPool = new SoundPool(1, AudioManager.STREAM_RING, 0);
+        mTickSoundId = mSoundPool.load(getContext(), R.raw.sound_slider_tick, 1);
     }
 
     public void setNumberOfBar(int newValue) {
@@ -146,6 +154,7 @@ public class GearSlider extends FrameLayout {
     }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        float rulerPosition;
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
@@ -155,12 +164,14 @@ public class GearSlider extends FrameLayout {
             } else if ((mRulerView.getX() + mRulerView.getWidth()) - distanceX < getWidth() / 2) {
                 Log.i(DEBUG_TAG, "Too High Value");
             } else {
-                mCurrentValue = (int) (mNumberOfBar * ((mRulerView.getX() * -1) + (getWidth() / 2)) / mRulerView.getWidth());
+                int previousValue = (int) (rulerPosition / mIntervalOfBar);
+                rulerPosition = (mRulerView.getX() * -1) + (getWidth() / 2);
+                if(previousValue != (int) (rulerPosition/mIntervalOfBar)) playTickSound();
+                mCurrentValue = (int) ( mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
                 mRulerView.setX(mRulerView.getX() - distanceX);
                 if (mListener != null) {
                     mListener.onValueChange(mCurrentValue);
                 }
-                Log.i(DEBUG_TAG, String.format("mCurrentValue=%d", mCurrentValue));
             }
             return true;
         }
@@ -170,8 +181,6 @@ public class GearSlider extends FrameLayout {
                                float velocityX, float velocityY) {
             if (!isFling)
                 return true;
-            Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
-            Log.d(DEBUG_TAG, "VelocityX: " + velocityX);
             int tempValue;
             int moveValue;
             if (Math.abs(velocityX) > 4000) {
@@ -201,11 +210,29 @@ public class GearSlider extends FrameLayout {
                 return (int) ( mFlingMinValue + ((mFlingMaxValue - mFlingMinValue) / 10) * velocityX);
             }
         }
+
+        private void playTickSound() {
+            Log.e(DEBUG_TAG, "TICK!!!");
+            mSoundPool.play(mTickSoundId, 1, 1, 0, 0, 1);
+        }
+    }
+
+    public void shake(){
+
+    }
+
+    public class ShakeInterpolator implements Interpolator {
+        public ShakeInterpolator() {}
+
+        @Override
+        public float getInterpolation(float t) {
+            double x=Math.sin(2*Math.PI*2*t);
+            return (float) (x*(1-t));
+        }
     }
 
     public void setValueWithAnimation(int value) {
         mCurrentValue = value;
-        Log.i(DEBUG_TAG, String.format("mCurrentValue=%d", mCurrentValue));
         final ObjectAnimator oa = ObjectAnimator.ofFloat(mRulerView, "x", (getWidth() / 2) - (mIntervalOfBar * value));
         AnimatorSet set = new AnimatorSet();
         set.playTogether(Glider.glide(Skill.ExpoEaseOut, 1200, oa));
