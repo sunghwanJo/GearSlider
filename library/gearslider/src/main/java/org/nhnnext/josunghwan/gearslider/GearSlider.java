@@ -10,6 +10,8 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
@@ -218,7 +220,8 @@ public class GearSlider extends FrameLayout {
     }
 
     public void shake(){
-
+        Animation ani = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        mRulerView.startAnimation(ani);
     }
 
     public class ShakeInterpolator implements Interpolator {

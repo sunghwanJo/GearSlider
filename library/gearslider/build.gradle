@@ -1,11 +1,22 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+publish {
+    userOrg = 'sunghwanjo'
+    groupId = 'org.nhnnext.sunghwanjo'
+    artifactId = 'gearslider'
+    publishVersion = '0.1.1'
+    desc = 'GearSlider UI for Android - It was inspired by the Adjust UI of Instagram.'
+    website = 'https://github.com/sunghwanJo/GearSlider'
+    issueTracker = "${website}/issues"
+    repository = "${website}.git"
+}
 
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
