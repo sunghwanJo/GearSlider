@@ -213,7 +213,7 @@ public class GearSlider extends FrameLayout {
 
         private void playTickSound() {
             Log.e(DEBUG_TAG, "TICK!!!");
-            mSoundPool.play(mTickSoundId, 1, 1, 0, 0, 1);
+            mSoundPool.play(mTickSoundId, 0.075f, 0.075f, 0, 0, 1);
         }
     }
 
