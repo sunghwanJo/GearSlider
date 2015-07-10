@@ -255,7 +255,7 @@ public class GearSlider extends FrameLayout {
     public int getValue() {
         return mCurrentValue;
     }
-
+    
     public int getMinimumValue() {
         return 0;
     }
