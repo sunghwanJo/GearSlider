@@ -13,7 +13,6 @@ import org.nhnnext.josunghwan.gearsliderdemo.R
 
 
 public class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super<AppCompatActivity>.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

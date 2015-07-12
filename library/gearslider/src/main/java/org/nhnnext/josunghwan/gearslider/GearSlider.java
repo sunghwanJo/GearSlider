@@ -104,7 +104,7 @@ public class GearSlider extends FrameLayout {
         }
         setClickable(true);
         setBackgroundColor(mBackgroundColor);
-        mDetector = new GestureDetectorCompat(getContext(), new MyGestureListener());
+        mDetector = new GestureDetectorCompat(getContext(), new GearSliderGestureListener());
         initializeSound();
     }
 
@@ -141,6 +141,9 @@ public class GearSlider extends FrameLayout {
         }
     }
 
+    /*
+     *  Public Methods
+     */
     public void setNumberOfBar(int newValue) {
         mNumberOfBar = newValue;
         removeView(mRulerView);
@@ -152,6 +155,53 @@ public class GearSlider extends FrameLayout {
 
         mCenterBar = new CenterBar(mContext, mBackgroundColor, mCenterBarColor, mHeightOfLongBar);
         addView(mCenterBar);
+    }
+
+    public void setVolume(int volumeValue){
+        mSoundVolume = volumeValue/100;
+    }
+
+    public void mute(){
+        isPlaySound = false;
+    }
+
+    public void unmute(){
+        isPlaySound = true;
+    }
+
+    public void shake(){
+        Animation ani = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        mRulerView.startAnimation(ani);
+    }
+
+    public void setValueWithAnimation(int value) {
+        mCurrentValue = value;
+        final ObjectAnimator oa = ObjectAnimator.ofFloat(mRulerView, "x", (getWidth() / 2) - (mIntervalOfBar * value));
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(Glider.glide(Skill.ExpoEaseOut, 1200, oa));
+        set.setDuration(1200);
+        set.start();
+        if (mListener != null)
+            mListener.onValueChange(value);
+    }
+
+    public void setValue(int value) {
+        mCurrentValue = value;
+        mRulerView.setX((getWidth() / 2) - (mIntervalOfBar * value));
+        if (mListener != null)
+            mListener.onValueChange(value);
+    }
+
+    public int getValue() {
+        return mCurrentValue;
+    }
+
+    public int getMinimumValue() {
+        return 0;
+    }
+
+    public int getMaximumValue() {
+        return mNumberOfBar - 1;
     }
 
     @Override
@@ -181,8 +231,8 @@ public class GearSlider extends FrameLayout {
         super.onSizeChanged(w, h, oldw, oldh);
         mRulerView.setX(w / 2 - (mIntervalOfBar * mCurrentValue));
     }
+    class GearSliderGestureListener extends GestureDetector.SimpleOnGestureListener {
 
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
         float rulerPosition;
 
         @Override
@@ -238,58 +288,11 @@ public class GearSlider extends FrameLayout {
             else
                 return (int) ( mFlingMinValue + ((mFlingMaxValue - mFlingMinValue) / 10) * velocityX);
         }
-
-        private void playTickSound() {
-            if(isPlaySound)
-                mSoundPool.play(mTickSoundId, mSoundVolume, mSoundVolume, 0, 0, 1);
-        }
     }
 
-    public void setVolume(int volumeValue){
-        mSoundVolume = volumeValue/100;
-    }
-
-    public void mute(){
-        isPlaySound = false;
-    }
-
-    public void unmute(){
-        isPlaySound = true;
-    }
-
-    public void shake(){
-        Animation ani = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
-        mRulerView.startAnimation(ani);
-    }
-
-    public void setValueWithAnimation(int value) {
-        mCurrentValue = value;
-        final ObjectAnimator oa = ObjectAnimator.ofFloat(mRulerView, "x", (getWidth() / 2) - (mIntervalOfBar * value));
-        AnimatorSet set = new AnimatorSet();
-        set.playTogether(Glider.glide(Skill.ExpoEaseOut, 1200, oa));
-        set.setDuration(1200);
-        set.start();
-        if (mListener != null)
-            mListener.onValueChange(value);
-    }
-
-    public void setValue(int value) {
-        mCurrentValue = value;
-        mRulerView.setX((getWidth() / 2) - (mIntervalOfBar * value));
-        if (mListener != null)
-            mListener.onValueChange(value);
-    }
-
-    public int getValue() {
-        return mCurrentValue;
-    }
-    
-    public int getMinimumValue() {
-        return 0;
-    }
-
-    public int getMaximumValue() {
-        return mNumberOfBar - 1;
+    private void playTickSound() {
+        if(isPlaySound)
+            mSoundPool.play(mTickSoundId, mSoundVolume, mSoundVolume, 0, 0, 1);
     }
 
 
