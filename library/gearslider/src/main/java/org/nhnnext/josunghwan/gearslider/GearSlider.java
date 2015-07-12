@@ -12,7 +12,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
 import com.daimajia.easing.Glider;
@@ -25,6 +24,21 @@ import com.nineoldandroids.animation.ObjectAnimator;
  */
 public class GearSlider extends FrameLayout {
     private static final String DEBUG_TAG = GearSlider.class.getSimpleName();
+
+    private static final int DEFAULT_VALUE = 50;
+    private static final int DEFAULT_NUMBER_OF_BAR = 100;
+    private static final int DEFAULT_INTERVAL_OF_LONGBAR = 10;
+
+    private static final int DEFAULT_INTERVAL_OF_BAR = 15;
+    private static final int DEFAULT_HEIGHT_OF_BAR = 25;
+    private static final int DEFAULT_HEIGHT_OF_LONGBAR = 40;
+
+    private static final int DEFAULT_CENTER_BAR_COLOR = 0xffff0000;
+    private static final int DEFAULT_BACKGROUND_COLOR = 0xffffffff;
+    private static final int DEFAULT_BAR_COLOR = 0xff000000;
+    private static final boolean DEFAULT_IS_FLING = false;
+    private static final int DEFAULT_FLING_MAX = 50;
+    private static final int DEFAULT_FLING_MIN = 5;
 
     protected int mNumberOfBar;
     protected int mIntervalOfBar;
@@ -41,13 +55,19 @@ public class GearSlider extends FrameLayout {
     private int mFlingMaxValue;
     private int mFlingMinValue;
 
+    private boolean isPlaySound;
     private SoundPool mSoundPool;
     private int mTickSoundId;
+    private float mSoundVolume;
 
     public static float DPSIZE;
 
     public interface OnValueChangeListener {
         void onValueChange(int value);
+    }
+
+    public void setChangeValueListener(OnValueChangeListener listener) {
+        mListener = listener;
     }
 
     private Context mContext;
@@ -61,57 +81,64 @@ public class GearSlider extends FrameLayout {
 
     public GearSlider(Context context) {
         super(context);
-        initGearSliderView(context);
+        initGearSliderView(context, null);
     }
 
     public GearSlider(Context context, AttributeSet attrs) {
         super(context, attrs);
-        TypedArray a = context.getTheme().obtainStyledAttributes(
-                attrs,
-                R.styleable.GearSlider,
-                0, 0);
-
-        try {
-            //TODO : DEFAULT VALUE에 대한 고민 및 코드 작성
-            mCurrentValue = a.getInteger(R.styleable.GearSlider_init_value, 0);
-            mNumberOfBar = a.getInteger(R.styleable.GearSlider_number_of_bar, 50);
-            mIntervalOfLongBar = a.getInteger(R.styleable.GearSlider_interval_of_longbar, 5);
-
-            mIntervalOfBar = a.getDimensionPixelSize(R.styleable.GearSlider_interval_of_bar, -1);
-            mHeightOfBar = a.getDimensionPixelSize(R.styleable.GearSlider_height_of_bar, -1);
-            mHeightOfLongBar = a.getDimensionPixelSize(R.styleable.GearSlider_height_of_longbar, -1);
-
-            mCenterBarColor = a.getColor(R.styleable.GearSlider_centerbar_color, -1);
-            mBackgroundColor = a.getColor(R.styleable.GearSlider_background_color, -1);
-            mBarColor = a.getColor(R.styleable.GearSlider_bar_color, -1);
-
-            isFling = a.getBoolean(R.styleable.GearSlider_on_fling, false);
-            mFlingMaxValue = a.getInteger(R.styleable.GearSlider_fling_max_value, 24);
-            mFlingMinValue = a.getInteger(R.styleable.GearSlider_fling_min_value, 4);
-        } finally {
-            a.recycle();
-        }
-        initGearSliderView(context);
+        initGearSliderView(context, attrs);
     }
 
     public GearSlider(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initGearSliderView(context);
+        initGearSliderView(context, attrs);
     }
 
-    public void setChangeValueListener(OnValueChangeListener listener) {
-        mListener = listener;
-    }
 
-    public void initGearSliderView(Context context) {
+    public void initGearSliderView(Context context, AttributeSet attrs) {
         mContext = context;
         DPSIZE = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 1, getResources().getDisplayMetrics());
+        if(attrs != null) {
+            initializeWithAttrs(context, attrs);
+        }
         setClickable(true);
         setBackgroundColor(mBackgroundColor);
         mDetector = new GestureDetectorCompat(getContext(), new MyGestureListener());
+        initializeSound();
+    }
+
+    private void initializeSound() {
+        isPlaySound = true;
+        mSoundVolume = 0.075f;
         mSoundPool = new SoundPool(1, AudioManager.STREAM_RING, 0);
         mTickSoundId = mSoundPool.load(getContext(), R.raw.sound_slider_tick, 1);
+    }
+
+    private void initializeWithAttrs(Context context, AttributeSet attrs) {
+        TypedArray a = context.getTheme().obtainStyledAttributes(
+                attrs,
+                R.styleable.GearSlider,
+                0, 0);
+        try {
+            mCurrentValue = a.getInteger(R.styleable.GearSlider_init_value, DEFAULT_VALUE);
+            mNumberOfBar = a.getInteger(R.styleable.GearSlider_number_of_bar, DEFAULT_NUMBER_OF_BAR);
+            mIntervalOfLongBar = a.getInteger(R.styleable.GearSlider_interval_of_longbar, DEFAULT_INTERVAL_OF_LONGBAR);
+
+            mIntervalOfBar = a.getDimensionPixelSize(R.styleable.GearSlider_interval_of_bar, (int) (DEFAULT_INTERVAL_OF_BAR * DPSIZE));
+            mHeightOfBar = a.getDimensionPixelSize(R.styleable.GearSlider_height_of_bar, (int) (DEFAULT_HEIGHT_OF_BAR*DPSIZE));
+            mHeightOfLongBar = a.getDimensionPixelSize(R.styleable.GearSlider_height_of_longbar, (int) (DEFAULT_HEIGHT_OF_LONGBAR*DPSIZE));
+
+            mCenterBarColor = a.getColor(R.styleable.GearSlider_centerbar_color, DEFAULT_CENTER_BAR_COLOR);
+            mBackgroundColor = a.getColor(R.styleable.GearSlider_background_color, DEFAULT_BACKGROUND_COLOR);
+            mBarColor = a.getColor(R.styleable.GearSlider_bar_color, DEFAULT_BAR_COLOR);
+
+            isFling = a.getBoolean(R.styleable.GearSlider_on_fling, DEFAULT_IS_FLING);
+            mFlingMaxValue = a.getInteger(R.styleable.GearSlider_fling_max_value, DEFAULT_FLING_MAX);
+            mFlingMinValue = a.getInteger(R.styleable.GearSlider_fling_min_value, DEFAULT_FLING_MIN);
+        } finally {
+            a.recycle();
+        }
     }
 
     public void setNumberOfBar(int newValue) {
@@ -187,17 +214,17 @@ public class GearSlider extends FrameLayout {
             int moveValue;
             if (Math.abs(velocityX) > 4000) {
                 moveValue = getMoveValue(Math.abs(velocityX));
-                if (velocityX < 0) {
+                if (velocityX < 0)
                     if (mCurrentValue + moveValue > getMaximumValue() + 1)
                         tempValue = getMaximumValue() + 1;
                     else
                         tempValue = mCurrentValue + moveValue;
-                } else {
+                else
                     if (mCurrentValue - moveValue < getMinimumValue())
                         tempValue = getMinimumValue();
                     else
                         tempValue = mCurrentValue - moveValue;
-                }
+
                 setValueWithAnimation(tempValue);
             }
             return true;
@@ -208,30 +235,31 @@ public class GearSlider extends FrameLayout {
             velocityX -= 4;
             if (velocityX > 10)
                 return mFlingMaxValue;
-            else {
+            else
                 return (int) ( mFlingMinValue + ((mFlingMaxValue - mFlingMinValue) / 10) * velocityX);
-            }
         }
 
         private void playTickSound() {
-            Log.e(DEBUG_TAG, "TICK!!!");
-            mSoundPool.play(mTickSoundId, 0.075f, 0.075f, 0, 0, 1);
+            if(isPlaySound)
+                mSoundPool.play(mTickSoundId, mSoundVolume, mSoundVolume, 0, 0, 1);
         }
+    }
+
+    public void setVolume(int volumeValue){
+        mSoundVolume = volumeValue/100;
+    }
+
+    public void mute(){
+        isPlaySound = false;
+    }
+
+    public void unmute(){
+        isPlaySound = true;
     }
 
     public void shake(){
         Animation ani = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
         mRulerView.startAnimation(ani);
-    }
-
-    public class ShakeInterpolator implements Interpolator {
-        public ShakeInterpolator() {}
-
-        @Override
-        public float getInterpolation(float t) {
-            double x=Math.sin(2*Math.PI*2*t);
-            return (float) (x*(1-t));
-        }
     }
 
     public void setValueWithAnimation(int value) {
@@ -263,5 +291,7 @@ public class GearSlider extends FrameLayout {
     public int getMaximumValue() {
         return mNumberOfBar - 1;
     }
+
+
 
 }
