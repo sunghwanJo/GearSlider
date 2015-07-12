@@ -1,12 +1,8 @@
 # GearSlider
 GearSlider UI for Android - It was inspired by the Adjust UI of Instagram.
 
----
-
 # Sample Project
 preparing..
-
----
 
 # Gradle Dependency (jCenter)
 
@@ -17,7 +13,9 @@ dependencies {
     compile 'org.nhnnext.sunghwanjo:gearslider:0.1.1'
 }
 ```
+
 ---
+
 # Simple Usage
 
 Add res-auto
