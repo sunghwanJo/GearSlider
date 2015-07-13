@@ -22,6 +22,7 @@ public class MainActivity : AppCompatActivity(), GearSlider.OnValueChangeListene
         setContentView(R.layout.activity_main)
         gs = findViewById(R.id.gearslider1) as GearSlider
         gs!!.setChangeValueListener(this);
+        gs!!.setMagnetEffect(true);
     }
 
     override fun onValueChange(value: Int) {

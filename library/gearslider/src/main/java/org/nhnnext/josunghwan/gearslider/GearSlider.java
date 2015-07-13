@@ -101,7 +101,7 @@ public class GearSlider extends FrameLayout {
         mContext = context;
         DPSIZE = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 1, getResources().getDisplayMetrics());
-        if(attrs != null) {
+        if (attrs != null) {
             initializeWithAttrs(context, attrs);
         }
         setClickable(true);
@@ -129,8 +129,8 @@ public class GearSlider extends FrameLayout {
             mIntervalOfLongBar = a.getInteger(R.styleable.GearSlider_interval_of_longbar, DEFAULT_INTERVAL_OF_LONGBAR);
 
             mIntervalOfBar = a.getDimensionPixelSize(R.styleable.GearSlider_interval_of_bar, (int) (DEFAULT_INTERVAL_OF_BAR * DPSIZE));
-            mHeightOfBar = a.getDimensionPixelSize(R.styleable.GearSlider_height_of_bar, (int) (DEFAULT_HEIGHT_OF_BAR*DPSIZE));
-            mHeightOfLongBar = a.getDimensionPixelSize(R.styleable.GearSlider_height_of_longbar, (int) (DEFAULT_HEIGHT_OF_LONGBAR*DPSIZE));
+            mHeightOfBar = a.getDimensionPixelSize(R.styleable.GearSlider_height_of_bar, (int) (DEFAULT_HEIGHT_OF_BAR * DPSIZE));
+            mHeightOfLongBar = a.getDimensionPixelSize(R.styleable.GearSlider_height_of_longbar, (int) (DEFAULT_HEIGHT_OF_LONGBAR * DPSIZE));
 
             mCenterBarColor = a.getColor(R.styleable.GearSlider_centerbar_color, DEFAULT_CENTER_BAR_COLOR);
             mBackgroundColor = a.getColor(R.styleable.GearSlider_background_color, DEFAULT_BACKGROUND_COLOR);
@@ -160,19 +160,19 @@ public class GearSlider extends FrameLayout {
         addView(mCenterBar);
     }
 
-    public void setVolume(int volumeValue){
-        mSoundVolume = volumeValue/100;
+    public void setVolume(int volumeValue) {
+        mSoundVolume = volumeValue / 100;
     }
 
-    public void mute(){
+    public void mute() {
         isPlaySound = false;
     }
 
-    public void unmute(){
+    public void unmute() {
         isPlaySound = true;
     }
 
-    public void shake(){
+    public void shake() {
         Animation ani = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
         mRulerView.startAnimation(ani);
     }
@@ -242,6 +242,7 @@ public class GearSlider extends FrameLayout {
         super.onSizeChanged(w, h, oldw, oldh);
         mRulerView.setX(w / 2 - (mIntervalOfBar * mCurrentValue));
     }
+
     class GearSliderGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         float rulerPosition;
@@ -256,8 +257,8 @@ public class GearSlider extends FrameLayout {
             } else {
                 int previousValue = (int) (rulerPosition / mIntervalOfBar);
                 rulerPosition = (mRulerView.getX() * -1) + (getWidth() / 2);
-                if(previousValue != (int) (rulerPosition/mIntervalOfBar)) playTickSound();
-                mCurrentValue = (int) ( mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
+                if (previousValue != (int) (rulerPosition / mIntervalOfBar)) playTickSound();
+                mCurrentValue = Math.round(mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
                 mRulerView.setX(mRulerView.getX() - distanceX);
                 if (mListener != null) {
                     mListener.onValueChange(mCurrentValue);
@@ -281,11 +282,10 @@ public class GearSlider extends FrameLayout {
                         tempValue = getMaximumValue();
                     else
                         tempValue = mCurrentValue + moveValue;
+                else if (mCurrentValue - moveValue < getMinimumValue())
+                    tempValue = getMinimumValue();
                 else
-                    if (mCurrentValue - moveValue < getMinimumValue())
-                        tempValue = getMinimumValue();
-                    else
-                        tempValue = mCurrentValue - moveValue;
+                    tempValue = mCurrentValue - moveValue;
 
                 setValueWithAnimation(tempValue);
             }
@@ -298,15 +298,14 @@ public class GearSlider extends FrameLayout {
             if (velocityX > 10)
                 return mFlingMaxValue;
             else
-                return (int) ( mFlingMinValue + ((mFlingMaxValue - mFlingMinValue) / 10) * velocityX);
+                return (int) (mFlingMinValue + ((mFlingMaxValue - mFlingMinValue) / 10) * velocityX);
         }
     }
 
     private void playTickSound() {
-        if(isPlaySound)
+        if (isPlaySound)
             mSoundPool.play(mTickSoundId, mSoundVolume, mSoundVolume, 0, 0, 1);
     }
-
 
 
 }
