@@ -4,7 +4,7 @@ publish {
     userOrg = 'sunghwanjo'
     groupId = 'org.nhnnext.sunghwanjo'
     artifactId = 'gearslider'
-    publishVersion = '0.1.5'
+    publishVersion = '0.1.6'
     desc = 'GearSlider UI for Android - It was inspired by the Adjust UI of Instagram.'
     website = 'https://github.com/sunghwanJo/GearSlider'
     issueTracker = "${website}/issues"

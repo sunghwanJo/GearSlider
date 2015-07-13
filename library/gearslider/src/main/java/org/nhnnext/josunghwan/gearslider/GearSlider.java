@@ -208,7 +208,7 @@ public class GearSlider extends FrameLayout {
     }
 
     public int getMaximumValue() {
-        return mNumberOfBar - 1;
+        return mNumberOfBar;
     }
 
     @Override
@@ -251,7 +251,7 @@ public class GearSlider extends FrameLayout {
                                 float distanceY) {
             if (getWidth() / 2 < (mRulerView.getX() - distanceX)) {
                 Log.i(DEBUG_TAG, "Too Low Value");
-            } else if ((mRulerView.getX() + mRulerView.getWidth()) - distanceX < (getWidth() / 2)+1) {
+            } else if ((mRulerView.getX() + mRulerView.getWidth()) - distanceX < (getWidth() / 2) - DPSIZE) {
                 Log.i(DEBUG_TAG, "Too High Value");
             } else {
                 int previousValue = (int) (rulerPosition / mIntervalOfBar);
@@ -277,8 +277,8 @@ public class GearSlider extends FrameLayout {
             if (Math.abs(velocityX) > 4000) {
                 moveValue = getMoveValue(Math.abs(velocityX));
                 if (velocityX < 0)
-                    if (mCurrentValue + moveValue > getMaximumValue() + 1)
-                        tempValue = getMaximumValue() + 1;
+                    if (mCurrentValue + moveValue > getMaximumValue())
+                        tempValue = getMaximumValue();
                     else
                         tempValue = mCurrentValue + moveValue;
                 else
