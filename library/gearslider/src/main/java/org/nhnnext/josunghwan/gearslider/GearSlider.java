@@ -60,6 +60,8 @@ public class GearSlider extends FrameLayout {
     private int mTickSoundId;
     private float mSoundVolume;
 
+    private boolean isMagnetEffect;
+
     public static float DPSIZE;
 
     public interface OnValueChangeListener {
@@ -106,6 +108,7 @@ public class GearSlider extends FrameLayout {
         setBackgroundColor(mBackgroundColor);
         mDetector = new GestureDetectorCompat(getContext(), new GearSliderGestureListener());
         initializeSound();
+        isMagnetEffect = false;
     }
 
     private void initializeSound() {
@@ -178,8 +181,8 @@ public class GearSlider extends FrameLayout {
         mCurrentValue = value;
         final ObjectAnimator oa = ObjectAnimator.ofFloat(mRulerView, "x", (getWidth() / 2) - (mIntervalOfBar * value));
         AnimatorSet set = new AnimatorSet();
-        set.playTogether(Glider.glide(Skill.ExpoEaseOut, 1200, oa));
-        set.setDuration(1200);
+        set.playTogether(Glider.glide(Skill.ExpoEaseOut, 500, oa));
+        set.setDuration(500);
         set.start();
         if (mListener != null)
             mListener.onValueChange(value);
@@ -222,7 +225,12 @@ public class GearSlider extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        this.mDetector.onTouchEvent(event);
+        boolean detectedUp = event.getAction() == MotionEvent.ACTION_UP;
+
+        if (!mDetector.onTouchEvent(event) && detectedUp) {
+            Log.d(DEBUG_TAG, "Touch UP");
+            setValueWithAnimation(getValue());
+        }
         return super.onTouchEvent(event);
     }
 
@@ -259,7 +267,8 @@ public class GearSlider extends FrameLayout {
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
             if (!isFling)
-                return true;
+                return false;
+
             int tempValue;
             int moveValue;
             if (Math.abs(velocityX) > 4000) {
