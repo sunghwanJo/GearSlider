@@ -177,6 +177,10 @@ public class GearSlider extends FrameLayout {
         mRulerView.startAnimation(ani);
     }
 
+    public void setMagnetEffect(boolean isMagnetEffect) {
+        this.isMagnetEffect = isMagnetEffect;
+    }
+
     public void setValueWithAnimation(int value) {
         mCurrentValue = value;
         final ObjectAnimator oa = ObjectAnimator.ofFloat(mRulerView, "x", (getWidth() / 2) - (mIntervalOfBar * value));
@@ -227,8 +231,7 @@ public class GearSlider extends FrameLayout {
     public boolean onTouchEvent(MotionEvent event) {
         boolean detectedUp = event.getAction() == MotionEvent.ACTION_UP;
 
-        if (!mDetector.onTouchEvent(event) && detectedUp) {
-            Log.d(DEBUG_TAG, "Touch UP");
+        if (!mDetector.onTouchEvent(event) && detectedUp && isMagnetEffect) {
             setValueWithAnimation(getValue());
         }
         return super.onTouchEvent(event);

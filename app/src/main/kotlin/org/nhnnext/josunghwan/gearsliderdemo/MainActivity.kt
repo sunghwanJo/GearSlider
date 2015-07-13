@@ -13,9 +13,12 @@ import org.nhnnext.josunghwan.gearsliderdemo.R
 
 
 public class MainActivity : AppCompatActivity() {
+    private var gs: GearSlider? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super<AppCompatActivity>.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        gs = findViewById(R.id.gearslider1) as GearSlider
     }
 
 
