@@ -10,7 +10,7 @@ Easily reference the library in your Android projects using this dependency in y
 
 ```Gradle
 dependencies {
-    compile 'org.nhnnext.sunghwanjo:gearslider:0.1.1'
+    compile 'org.nhnnext.sunghwanjo:gearslider:0.1.7'
 }
 ```
 
