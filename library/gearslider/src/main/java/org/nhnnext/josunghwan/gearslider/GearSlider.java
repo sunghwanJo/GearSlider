@@ -251,7 +251,7 @@ public class GearSlider extends FrameLayout {
                                 float distanceY) {
             if (getWidth() / 2 < (mRulerView.getX() - distanceX)) {
                 Log.i(DEBUG_TAG, "Too Low Value");
-            } else if ((mRulerView.getX() + mRulerView.getWidth()) - distanceX < getWidth() / 2) {
+            } else if ((mRulerView.getX() + mRulerView.getWidth()) - distanceX < (getWidth() / 2)+1) {
                 Log.i(DEBUG_TAG, "Too High Value");
             } else {
                 int previousValue = (int) (rulerPosition / mIntervalOfBar);
