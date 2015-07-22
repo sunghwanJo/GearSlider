@@ -16,6 +16,7 @@ import org.nhnnext.josunghwan.gearsliderdemo.R
 public class MainActivity : AppCompatActivity(), GearSlider.OnValueChangeListener {
     private val TAG: String = "MainActivity"
     private var gs: GearSlider? = null
+    private var tv: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super<AppCompatActivity>.onCreate(savedInstanceState)
@@ -23,9 +24,13 @@ public class MainActivity : AppCompatActivity(), GearSlider.OnValueChangeListene
         gs = findViewById(R.id.gearslider1) as GearSlider
         gs!!.setChangeValueListener(this);
         gs!!.setMagnetEffect(true);
+
+        tv = findViewById(R.id.tv1) as TextView;
+
     }
 
     override fun onValueChange(value: Int) {
         Log.d(TAG, "value :$value")
+        tv!!.setText("$value")
     }
 }
