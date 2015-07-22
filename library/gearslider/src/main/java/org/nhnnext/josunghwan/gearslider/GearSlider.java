@@ -189,8 +189,8 @@ public class GearSlider extends FrameLayout {
         mCurrentValue = value;
         final ObjectAnimator oa = ObjectAnimator.ofFloat(mRulerView, "x", (getWidth() / 2) - (mIntervalOfBar * value));
         AnimatorSet set = new AnimatorSet();
-        set.playTogether(Glider.glide(Skill.ExpoEaseOut, 500, oa));
-        set.setDuration(500);
+        set.playTogether(Glider.glide(Skill.ExpoEaseOut, 200, oa));
+        set.setDuration(200);
         set.start();
         if (mListener != null)
             mListener.onValueChange(value);
@@ -234,43 +234,16 @@ public class GearSlider extends FrameLayout {
         mCenterBar = new CenterBar(mContext, mBackgroundColor, mCenterBarColor, mHeightOfLongBar);
         addView(mCenterBar);
     }
-    boolean isFlinging=false;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean detectedUp = event.getAction() == MotionEvent.ACTION_UP;
-        boolean touchEvent = mDetector.onTouchEvent(event);
-
-        if (!isFlinging && !touchEvent && detectedUp && isMagnetEffect) {
-            Log.e(DEBUG_TAG, "JUST UP");
+        mDetector.onTouchEvent(event);
+        if ( detectedUp && isMagnetEffect) {
             setValueWithAnimation(getValue());
             mDistanceSum = 0;
-        }else if(detectedUp && isFlinging && isMagnetEffect){
-            Log.e(DEBUG_TAG, "Fling2");
-            isFlinging = false;
-            final MotionEvent motionevent = makeActionUpMock();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    onTouchEvent(motionevent);
-                }
-            }, 200);
         }
         return super.onTouchEvent(event);
-    }
-
-    private MotionEvent makeActionUpMock() {
-        long downTime = SystemClock.uptimeMillis();
-        long eventTime = SystemClock.uptimeMillis() + 100;
-        float x = 0.0f;
-        float y = 0.0f;
-        int metaState = 0;
-        return MotionEvent.obtain(
-                downTime,
-                eventTime,
-                MotionEvent.ACTION_UP,
-                x,
-                y,
-                metaState);
     }
 
     @Override
@@ -317,8 +290,6 @@ public class GearSlider extends FrameLayout {
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
             if (!isFling) {
-                Log.e(DEBUG_TAG, "Fling!!");
-                isFlinging = true;
                 return false;
             }
 
