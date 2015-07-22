@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -195,9 +197,9 @@ public class GearSlider extends FrameLayout {
     }
 
     public void setValue(int value) {
-        if(value < getMinimumValue())
+        if (value < getMinimumValue())
             value = getMinimumValue();
-        if(value > getMaximumValue())
+        if (value > getMaximumValue())
             value = getMaximumValue();
         mCurrentValue = value;
         mRulerView.setX((getWidth() / 2) - (mIntervalOfBar * value));
@@ -232,16 +234,43 @@ public class GearSlider extends FrameLayout {
         mCenterBar = new CenterBar(mContext, mBackgroundColor, mCenterBarColor, mHeightOfLongBar);
         addView(mCenterBar);
     }
-
+    boolean isFlinging=false;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean detectedUp = event.getAction() == MotionEvent.ACTION_UP;
+        boolean touchEvent = mDetector.onTouchEvent(event);
 
-        if (!mDetector.onTouchEvent(event) && detectedUp && isMagnetEffect) {
+        if (!isFlinging && !touchEvent && detectedUp && isMagnetEffect) {
+            Log.e(DEBUG_TAG, "JUST UP");
             setValueWithAnimation(getValue());
             mDistanceSum = 0;
+        }else if(detectedUp && isFlinging && isMagnetEffect){
+            Log.e(DEBUG_TAG, "Fling2");
+            isFlinging = false;
+            final MotionEvent motionevent = makeActionUpMock();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    onTouchEvent(motionevent);
+                }
+            }, 200);
         }
         return super.onTouchEvent(event);
+    }
+
+    private MotionEvent makeActionUpMock() {
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime = SystemClock.uptimeMillis() + 100;
+        float x = 0.0f;
+        float y = 0.0f;
+        int metaState = 0;
+        return MotionEvent.obtain(
+                downTime,
+                eventTime,
+                MotionEvent.ACTION_UP,
+                x,
+                y,
+                metaState);
     }
 
     @Override
@@ -257,8 +286,8 @@ public class GearSlider extends FrameLayout {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                                 float distanceY) {
-            if(mDistanceSum > 0 && distanceX < 0) mDistanceSum = 0;
-            if(mDistanceSum < 0 && distanceX > 0) mDistanceSum = 0;
+            if (mDistanceSum > 0 && distanceX < 0) mDistanceSum = 0;
+            if (mDistanceSum < 0 && distanceX > 0) mDistanceSum = 0;
             mDistanceSum += distanceX;
             if (getWidth() / 2 < (mRulerView.getX() - distanceX)) {
                 Log.i(DEBUG_TAG, "Too Low Value");
@@ -268,10 +297,14 @@ public class GearSlider extends FrameLayout {
                 int previousValue = (int) (rulerPosition / mIntervalOfBar);
                 rulerPosition = (mRulerView.getX() * -1) + (getWidth() / 2);
                 if (previousValue != (int) (rulerPosition / mIntervalOfBar)) playTickSound();
-                if(mDistanceSum>0)
-                    mCurrentValue = (int) Math.floor(mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
-                else
-                    mCurrentValue = (int) Math.ceil(mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
+                if (isMagnetEffect) {
+                    if (mDistanceSum > 0)
+                        mCurrentValue = (int) Math.floor(mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
+                    else
+                        mCurrentValue = (int) Math.ceil(mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
+                } else {
+                    mCurrentValue = Math.round(mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
+                }
                 mRulerView.setX(mRulerView.getX() - distanceX);
                 if (mListener != null) {
                     mListener.onValueChange(mCurrentValue);
@@ -283,8 +316,11 @@ public class GearSlider extends FrameLayout {
         @Override
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
-            if (!isFling)
+            if (!isFling) {
+                Log.e(DEBUG_TAG, "Fling!!");
+                isFlinging = true;
                 return false;
+            }
 
             int tempValue;
             int moveValue;
