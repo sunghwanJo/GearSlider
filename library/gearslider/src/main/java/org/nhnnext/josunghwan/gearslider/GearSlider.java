@@ -62,6 +62,8 @@ public class GearSlider extends FrameLayout {
 
     private boolean isMagnetEffect;
 
+    private int mDistanceSum;
+
     public static float DPSIZE;
 
     public interface OnValueChangeListener {
@@ -232,7 +234,11 @@ public class GearSlider extends FrameLayout {
         boolean detectedUp = event.getAction() == MotionEvent.ACTION_UP;
 
         if (!mDetector.onTouchEvent(event) && detectedUp && isMagnetEffect) {
-            setValueWithAnimation(getValue());
+            int value = getValue();
+            if(mDistanceSum>0)
+                value--;
+            setValueWithAnimation(value);
+            mDistanceSum = 0;
         }
         return super.onTouchEvent(event);
     }
@@ -250,6 +256,9 @@ public class GearSlider extends FrameLayout {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                                 float distanceY) {
+            if(mDistanceSum > 0 && distanceX < 0) mDistanceSum = 0;
+            if(mDistanceSum < 0 && distanceX > 0) mDistanceSum = 0;
+            mDistanceSum += distanceX;
             if (getWidth() / 2 < (mRulerView.getX() - distanceX)) {
                 Log.i(DEBUG_TAG, "Too Low Value");
             } else if ((mRulerView.getX() + mRulerView.getWidth()) - distanceX < (getWidth() / 2) - DPSIZE) {
@@ -258,7 +267,7 @@ public class GearSlider extends FrameLayout {
                 int previousValue = (int) (rulerPosition / mIntervalOfBar);
                 rulerPosition = (mRulerView.getX() * -1) + (getWidth() / 2);
                 if (previousValue != (int) (rulerPosition / mIntervalOfBar)) playTickSound();
-                mCurrentValue = Math.round(mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
+                mCurrentValue = (int) Math.ceil(mNumberOfBar * (rulerPosition) / mRulerView.getWidth());
                 mRulerView.setX(mRulerView.getX() - distanceX);
                 if (mListener != null) {
                     mListener.onValueChange(mCurrentValue);
